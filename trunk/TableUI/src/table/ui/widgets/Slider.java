@@ -1,4 +1,4 @@
-package table.ui.slider;
+package table.ui.widgets;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -11,6 +11,8 @@ import java.awt.event.MouseMotionListener;
 import java.util.Vector;
 
 import javax.swing.JComponent;
+
+import table.ui.widgetlisteners.SliderListener;
 
 public class Slider extends JComponent implements MouseListener,
 		MouseMotionListener {
@@ -40,7 +42,7 @@ public class Slider extends JComponent implements MouseListener,
 			System.out.println("Adding position: " + i);
 			allowedPositions.add((i - min) / max);
 		}
-
+		currentPosition = allowedPositions.size() - 1;
 		addMouseListener(this);
 		addMouseMotionListener(this);
 
