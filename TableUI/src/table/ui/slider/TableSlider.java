@@ -1,6 +1,7 @@
 package table.ui.slider;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -8,7 +9,6 @@ import java.awt.event.KeyListener;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 public class TableSlider extends JComponent implements KeyListener,
 		SliderListener, ButtonListener {
@@ -21,7 +21,6 @@ public class TableSlider extends JComponent implements KeyListener,
 	private String _units;
 	private int _max;
 	private int _min;
-	private int _step;
 
 	private Button downButton;
 	private Button upButton;
@@ -32,7 +31,6 @@ public class TableSlider extends JComponent implements KeyListener,
 		_units = units;
 		_max = max;
 		_min = min;
-		_step = step;
 
 		slider = new Slider(max, min, step, this);
 		downButton = new Button(this);
@@ -51,6 +49,9 @@ public class TableSlider extends JComponent implements KeyListener,
 	protected void paintComponent(Graphics g) {
 		g.setColor(Color.GRAY);
 		g.fillRect(0, 0, getWidth(), getHeight());
+		g.setColor(Color.BLACK);
+		g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
+		g.drawString(_units, (int)(getWidth() * 0.6), (int)(getHeight() * 0.12));
 	}
 
 	@Override
@@ -71,7 +72,6 @@ public class TableSlider extends JComponent implements KeyListener,
 
 	@Override
 	public void sliderUpdated(double newValue) {
-		// TODO Auto-generated method stub
 		double value = (_min + (1 - newValue) * (_max - _min));
 		
 		textField.setText("" + Math.round(value));
@@ -80,7 +80,6 @@ public class TableSlider extends JComponent implements KeyListener,
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		// TODO Auto-generated method stub
 		if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 			System.exit(0);
 		}
@@ -111,7 +110,7 @@ public class TableSlider extends JComponent implements KeyListener,
 		myPanel.setLayout(null);
 		myPanel.setBackground(Color.CYAN);
 
-		TableSlider s = new TableSlider("lbs", 0, 30, 5);
+		TableSlider s = new TableSlider("mins", 0, 30, 5);
 		s.setLocation(20, 50);
 		s.setSize(180, 350);
 		myPanel.add(s);
@@ -121,7 +120,7 @@ public class TableSlider extends JComponent implements KeyListener,
 		s2.setSize(180, 350);
 		myPanel.add(s2);
 
-		TableSlider s3 = new TableSlider("lbs", 0, 100, 10);
+		TableSlider s3 = new TableSlider("% vib", 0, 100, 10);
 		s3.setLocation(420, 50);
 		s3.setSize(180, 350);
 		myPanel.add(s3);
