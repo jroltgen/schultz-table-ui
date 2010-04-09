@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 
 import table.ui.widgetlisteners.ButtonListener;
 import table.ui.widgetlisteners.SliderListener;
+import table.ui.widgetlisteners.TableSliderListener;
 import table.ui.widgets.Button;
 import table.ui.widgets.Slider;
 import table.ui.widgets.TextField;
