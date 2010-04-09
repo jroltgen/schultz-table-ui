@@ -30,7 +30,7 @@ public class ArduinoConnection implements Runnable {
 	}
 
 	private enum Response {
-		FAILURE, SUCCESS
+		SUCCESS, FAILURE
 	}
 
 	private static final int BAUD_RATE = 9600;
@@ -63,12 +63,12 @@ public class ArduinoConnection implements Runnable {
 				e.printStackTrace();
 				return false;
 			}
-
+			System.out.println("Connecting");
 			if (portID.isCurrentlyOwned()) {
 				System.out.println("Error: Port is currently in use");
 			} else {
 				CommPort commPort;
-
+				System.out.println("Opening comm port");
 				// Open the port.
 				try {
 					commPort = portID.open(this.getClass().getName(),
@@ -77,7 +77,7 @@ public class ArduinoConnection implements Runnable {
 					e.printStackTrace();
 					return false;
 				}
-
+				System.out.println("Opened.");
 				if (commPort instanceof SerialPort) {
 					// Configure the port.
 					SerialPort serialPort = (SerialPort) commPort;
@@ -89,7 +89,7 @@ public class ArduinoConnection implements Runnable {
 						e.printStackTrace();
 						return false;
 					}
-
+					System.out.println("Initing data streams.");
 					try {
 						_in = new DataInputStream(serialPort.getInputStream());
 						_out = new DataOutputStream(serialPort
@@ -103,7 +103,7 @@ public class ArduinoConnection implements Runnable {
 					return false;
 				}
 			}
-
+			System.out.println("Sending message.");
 			// Send the connect message.
 			try {
 				_out.write(MessageType.CONNECT.ordinal());
@@ -237,7 +237,9 @@ public class ArduinoConnection implements Runnable {
 	 *             on exception
 	 */
 	private boolean handleAck() throws IOException {
+		System.out.println("Reading....");
 		int response = _in.read();
+		System.out.println("Got response: " + response);
 		if (response == Response.SUCCESS.ordinal()) {
 			return true;
 		} else {
@@ -265,6 +267,12 @@ public class ArduinoConnection implements Runnable {
 				return false;
 			}
 		}
+	}
+	
+	public static void main(String[] args) {
+		ArduinoConnection c = new ArduinoConnection();
+		c.connect("COM3");
+		System.out.println("Done connecting.");
 	}
 
 }
