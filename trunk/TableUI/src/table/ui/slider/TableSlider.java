@@ -1,6 +1,5 @@
 package table.ui.slider;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -9,8 +8,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
 
 import table.ui.widgetlisteners.ButtonListener;
 import table.ui.widgetlisteners.SliderListener;

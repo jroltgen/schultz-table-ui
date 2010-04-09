@@ -6,11 +6,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
 
-import javax.print.attribute.standard.Severity;
 import javax.swing.JComponent;
 
 import table.ui.widgetlisteners.ButtonListener;
