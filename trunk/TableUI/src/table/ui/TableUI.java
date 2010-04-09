@@ -7,7 +7,7 @@ import javax.swing.JPanel;
 
 import table.ui.control.ControlPanel;
 import table.ui.slider.TableSlider;
-import table.ui.slider.TableSliderListener;
+import table.ui.widgetlisteners.TableSliderListener;
 
 public class TableUI implements TableSliderListener {
 	private TableSlider runTime;
