@@ -4,13 +4,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import gnu.io.CommPort;
-import gnu.io.CommPortIdentifier;
-import gnu.io.NoSuchPortException;
-import gnu.io.PortInUseException;
-import gnu.io.SerialPort;
-import gnu.io.UnsupportedCommOperationException;
-
 /**
  * This class is for communicating with the Arduino microcontroller that is the
  * brains of the table. This class abstracts the underlying serial communication
@@ -22,98 +15,30 @@ import gnu.io.UnsupportedCommOperationException;
  * @author Jay Roltgen
  * 
  */
-public class ArduinoConnection implements Runnable {
+public abstract class ArduinoConnection implements Runnable {
 
-	private enum MessageType {
+	protected enum MessageType {
 		CONNECT, GET_PRESSURE, GET_VIBRATION, KEEP_ALIVE, SET_PRESSURE, 
 		SET_VIBRATION, START, STOP
 	}
 
-	private enum Response {
+	protected enum Response {
 		SUCCESS, FAILURE
 	}
 
-	private static final int BAUD_RATE = 9600;
-	private static final int TIMEOUT_MS = 3000;
-
-	private DataInputStream _in;
-	private DataOutputStream _out;
-
-	public ArduinoConnection() {
-
-	}
+	protected DataInputStream _in;
+	protected DataOutputStream _out;
+	
 
 	/**
 	 * Connects to the Arduino. This will return true if successful and false
-	 * otherwise.
-	 * 
-	 * @param comPortName
-	 * 		This is the string of the com port we wish to connect to, such
-	 * 		as "COM3", "COM5" or whatever the correct port is.
+	 * otherwise.  This method delegates the actual setting up of the data
+	 * input and output streams to the subclasses, which determine the actual
+	 * implementation of said set-up-age.
 	 * 
 	 * @return true on success, false on error.
 	 */
-	public boolean connect(String comPortName) {
-		synchronized (this) {
-			// Find the comm port.
-			CommPortIdentifier portID;
-			try {
-				portID = CommPortIdentifier.getPortIdentifier(comPortName);
-			} catch (NoSuchPortException e) {
-				e.printStackTrace();
-				return false;
-			}
-			System.out.println("Connecting");
-			if (portID.isCurrentlyOwned()) {
-				System.out.println("Error: Port is currently in use");
-			} else {
-				CommPort commPort;
-				System.out.println("Opening comm port");
-				// Open the port.
-				try {
-					commPort = portID.open(this.getClass().getName(),
-							TIMEOUT_MS);
-				} catch (PortInUseException e) {
-					e.printStackTrace();
-					return false;
-				}
-				System.out.println("Opened.");
-				if (commPort instanceof SerialPort) {
-					// Configure the port.
-					SerialPort serialPort = (SerialPort) commPort;
-					try {
-						serialPort.setSerialPortParams(BAUD_RATE,
-								SerialPort.DATABITS_8, SerialPort.STOPBITS_1,
-								SerialPort.PARITY_NONE);
-					} catch (UnsupportedCommOperationException e) {
-						e.printStackTrace();
-						return false;
-					}
-					System.out.println("Initing data streams.");
-					try {
-						_in = new DataInputStream(serialPort.getInputStream());
-						_out = new DataOutputStream(serialPort
-								.getOutputStream());
-					} catch (IOException e) {
-						e.printStackTrace();
-						return false;
-					}
-				} else {
-					System.out.println("Error: Is not a serial port.");
-					return false;
-				}
-			}
-			System.out.println("Sending message.");
-			// Send the connect message.
-			try {
-				_out.write(MessageType.CONNECT.ordinal());
-				return handleAck();
-			} catch (IOException e) {
-				e.printStackTrace();
-				return false;
-			}
-		}
-	}
+	public abstract boolean connect();
 
 	/**
 	 * Returns the actual pressure indicated by the table - this should be
@@ -227,7 +152,7 @@ public class ArduinoConnection implements Runnable {
 			}
 		}
 	};
-
+	
 	/**
 	 * Handles an acknowledgement from the arduino - returns false if a false
 	 * response or no response is received.
@@ -236,7 +161,7 @@ public class ArduinoConnection implements Runnable {
 	 * @throws IOException
 	 *             on exception
 	 */
-	private boolean handleAck() throws IOException {
+	protected boolean handleAck() throws IOException {
 		System.out.println("Reading....");
 		int response = _in.read();
 		System.out.println("Got response: " + response);
@@ -246,7 +171,7 @@ public class ArduinoConnection implements Runnable {
 			return false;
 		}
 	}
-
+	
 	/**
 	 * This method keeps the table alive by "feeding the watchdog" for the
 	 * table. This is provided so that in the event that the UI or computer
@@ -257,7 +182,7 @@ public class ArduinoConnection implements Runnable {
 	 * 
 	 * @return
 	 */
-	private boolean keepAlive() {
+	protected boolean keepAlive() {
 		synchronized (this) {
 			try {
 				_out.write(MessageType.KEEP_ALIVE.ordinal());
@@ -268,11 +193,13 @@ public class ArduinoConnection implements Runnable {
 			}
 		}
 	}
+
 	
 	public static void main(String[] args) {
-		ArduinoConnection c = new ArduinoConnection();
-		c.connect("COM3");
+		ArduinoConnectionDirectImpl c = new ArduinoConnectionDirectImpl();
+		c.connect();
 		System.out.println("Done connecting.");
 	}
+
 
 }

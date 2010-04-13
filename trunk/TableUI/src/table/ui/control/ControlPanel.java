@@ -103,7 +103,6 @@ public class ControlPanel extends JComponent implements ButtonListener, Runnable
 
 	@Override
 	public void buttonPressed(Button src) {
-		// TODO Auto-generated method stub
 		if (src == startButton && _running == false) {
 			start();
 		} else if (src == stopButton && _running == true) {
@@ -163,7 +162,6 @@ public class ControlPanel extends JComponent implements ButtonListener, Runnable
 	
 
 	private void updateTime() {
-		// TODO Auto-generated method stub
 		int mRemaining = secondsRemaining / 60;
 		int sRemaining = secondsRemaining % 60;
 		
