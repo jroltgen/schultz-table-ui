@@ -74,7 +74,6 @@ public class TableUI implements TableSliderListener {
 
 	@Override
 	public void tableSliderUpdated(double value, TableSlider src) {
-		// TODO Auto-generated method stub
 		if (src == runTime) {
 			controlPanel.setTargetTime((int)(Math.round(value) * 60));
 		}
