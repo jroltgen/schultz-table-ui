@@ -9,6 +9,8 @@ import java.awt.RenderingHints;
 
 import javax.swing.JComponent;
 
+import table.ArduinoConnection;
+import table.ui.TableUI;
 import table.ui.widgetlisteners.ButtonListener;
 import table.ui.widgets.Button;
 import table.ui.widgets.TextField;
@@ -33,7 +35,12 @@ public class ControlPanel extends JComponent implements ButtonListener, Runnable
 
 	private int _targetRunTimeSeconds;
 
-	public ControlPanel() {
+	private TableUI _tableUI;
+
+	public ControlPanel(TableUI ui) {
+		
+		_tableUI = ui;
+		
 		startButton = new Button(this, Color.GREEN, "RUN");
 		stopButton = new Button(this, Color.RED, "STOP");
 		resetButton = new Button(this, Color.DARK_GRAY, "RESET");
@@ -114,11 +121,15 @@ public class ControlPanel extends JComponent implements ButtonListener, Runnable
 	
 	private void stop() {
 		_running = false;
+		_tableUI.setRunningSliderEnabled(true);
+		ArduinoConnection.getInstance().stop();
 		repaint();
 	}
 	
 	private void start() {
 		_running = true;
+		_tableUI.setRunningSliderEnabled(false);
+		ArduinoConnection.getInstance().start();
 		repaint();
 	}
 
@@ -153,7 +164,7 @@ public class ControlPanel extends JComponent implements ButtonListener, Runnable
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			if (secondsRemaining < 1) {
+			if (secondsRemaining < 1 && _running) {
 				stop();
 			}
 		}
@@ -195,7 +206,7 @@ public class ControlPanel extends JComponent implements ButtonListener, Runnable
 
 	private void petTheWatchdog() {
 		// TODO Auto-generated method stub
-		
+		//ArduinoConnection.getInstance().keepAlive();
 	}
 	
 	public void setTargetTime(int tseconds) {

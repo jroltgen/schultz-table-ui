@@ -5,6 +5,8 @@ import java.awt.Color;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import table.ArduinoConnection;
+import table.ArduinoConnectionCSharpPipeImpl;
 import table.ui.control.ControlPanel;
 import table.ui.slider.TableSlider;
 import table.ui.widgetlisteners.TableSliderListener;
@@ -20,6 +22,7 @@ public class TableUI implements TableSliderListener {
 	 * For testing
 	 */
 	public static void main(String[] args) {
+		ArduinoConnection.getInstance().stop();
 		new TableUI().run();
 	}
 	
@@ -42,7 +45,7 @@ public class TableUI implements TableSliderListener {
 		runTime.setSize(160, 350);
 		myPanel.add(runTime);
 
-		pressure = new TableSlider("lbs", 0, 10, 5, this);
+		pressure = new TableSlider("lbs", 0, 50, 5, this);
 		pressure.setLocation(160, 30);
 		pressure.setSize(160, 350);
 		myPanel.add(pressure);
@@ -52,12 +55,12 @@ public class TableUI implements TableSliderListener {
 		vibration.setSize(160, 350);
 		myPanel.add(vibration);
 		
-		speed = new TableSlider("speed", 0, 100, 25, this);
+		speed = new TableSlider("speed", 0, 7, 1, this);
 		speed.setLocation(480, 30);
 		speed.setSize(160, 350);
 		myPanel.add(speed);
 		
-		controlPanel = new ControlPanel();
+		controlPanel = new ControlPanel(this);
 		controlPanel.setLocation(0, 400);
 		controlPanel.setSize(640, 80);
 		controlPanel.setTargetTime(0);
@@ -76,6 +79,17 @@ public class TableUI implements TableSliderListener {
 	public void tableSliderUpdated(double value, TableSlider src) {
 		if (src == runTime) {
 			controlPanel.setTargetTime((int)(Math.round(value) * 60));
+		} else if (src == vibration) {
+			ArduinoConnection.getInstance().setVibration((int)value);
+		} else if (src == pressure) {
+			ArduinoConnection.getInstance().setPressure((int)value);
+		} else if (src == speed) {
+			ArduinoConnection.getInstance().setSpeed((int)value);
 		}
+	}
+
+	public void setRunningSliderEnabled(boolean e) {
+		System.out.println("Setting enbled...\n");
+		runTime.setComponentEnabled(e);
 	}
 }

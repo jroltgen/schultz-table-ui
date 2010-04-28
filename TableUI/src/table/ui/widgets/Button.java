@@ -24,6 +24,7 @@ public class Button extends JComponent implements MouseListener {
 	private boolean _pressed = false;
 	private Color _color;
 	private String _text;
+	private boolean _enabled = true;
 
 	public Button(ButtonListener b) {
 		this(b, Color.BLUE, "");
@@ -41,6 +42,11 @@ public class Button extends JComponent implements MouseListener {
 		_listeners.add(l);
 	}
 	
+	public void setComponentEnabled(boolean e) {
+		_enabled = e;
+		repaint();
+	}
+	
 	@Override
 	protected void paintComponent(Graphics g) {
 
@@ -53,7 +59,11 @@ public class Button extends JComponent implements MouseListener {
 		if (_pressed) {
 			g2.setColor(Color.WHITE);
 		} else {
-			g2.setColor(_color);
+			if (_enabled) {
+				g2.setColor(_color);
+			} else {
+				g2.setColor(Color.DARK_GRAY);
+			}
 		}
 		g2.fillRect(0, 0, getWidth(), getHeight());
 		
@@ -76,18 +86,22 @@ public class Button extends JComponent implements MouseListener {
 
 	@Override
 	public void mousePressed(MouseEvent e) {
+		if (_enabled) {
 		// TODO Auto-generated method stub
-		_pressed  = true;
-		repaint();
+			_pressed  = true;
+			repaint();
+		}
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		// TODO Auto-generated method stub
-		_pressed = false;
-		for (ButtonListener l : _listeners) {
-			l.buttonPressed(this);
+		if (_enabled) {
+			_pressed = false;
+			for (ButtonListener l : _listeners) {
+				l.buttonPressed(this);
+			}
+			repaint();
 		}
-		repaint();
 	}
 }

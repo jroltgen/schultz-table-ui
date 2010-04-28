@@ -22,7 +22,7 @@ import gnu.io.UnsupportedCommOperationException;
  * @author Jay Roltgen
  * 
  */
-public class ArduinoConnectionDirectImpl extends ArduinoConnection implements Runnable {
+public class ArduinoConnectionDirectImpl extends ArduinoConnection {
 
 	private static final int BAUD_RATE = 9600;
 	private static final int TIMEOUT_MS = 3000;
@@ -92,6 +92,7 @@ public class ArduinoConnectionDirectImpl extends ArduinoConnection implements Ru
 			// Send the connect message.
 			try {
 				_out.write(MessageType.CONNECT.ordinal());
+				_out.write(0);
 				return handleAck();
 			} catch (IOException e) {
 				e.printStackTrace();

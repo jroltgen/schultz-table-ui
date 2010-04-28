@@ -13,8 +13,9 @@ public class ArduinoConnectionCSharpPipeImpl extends ArduinoConnection {
 
 	@Override
 	public boolean connect() {
+		System.out.println("connecting...");
 		try {
-			_arduinoSocket = new Socket(InetAddress.getByName("localhost"), 3000);
+			_arduinoSocket = new Socket(InetAddress.getByName("localhost"), 3007);
 			_in = new DataInputStream(_arduinoSocket.getInputStream());
 			_out = new DataOutputStream(_arduinoSocket.getOutputStream());
 		} catch (UnknownHostException e) {
@@ -24,7 +25,17 @@ public class ArduinoConnectionCSharpPipeImpl extends ArduinoConnection {
 			e.printStackTrace();
 			System.exit(0);
 		}
-		return true;
+		
+		System.out.println("Sending message.");
+		// Send the connect message.
+		try {
+			_out.write(MessageType.CONNECT.ordinal());
+			_out.write(0);
+			return handleAck();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 }
