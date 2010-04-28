@@ -107,6 +107,12 @@ public class TableSlider extends JComponent implements KeyListener,
 	public void keyTyped(KeyEvent e) {
 	}
 
+	public void setComponentEnabled(boolean e) {
+		downButton.setComponentEnabled(e);
+		upButton.setComponentEnabled(e);
+		slider.setComponentEnabled(e);
+		repaint();
+	}
 
 
 	@Override

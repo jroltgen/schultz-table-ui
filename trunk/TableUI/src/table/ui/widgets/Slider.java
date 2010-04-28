@@ -32,6 +32,9 @@ public class Slider extends JComponent implements MouseListener,
 
 	private double _max, _min, _step;
 
+	private boolean _selected;
+	private boolean _enabled = true;
+
 	public Slider(double max, double min, double step, SliderListener l) {
 		_listeners = new Vector<SliderListener>();
 		_listeners.add(l);
@@ -61,6 +64,12 @@ public class Slider extends JComponent implements MouseListener,
 		slidery = (int) (h * 0.05 + h / 6);
 		sliderh = (int) (h * 0.9 - h / 3);
 	}
+	
+	public void setComponentEnabled(boolean e) {
+		_enabled = e;
+		System.out.println("\n\n\n*********Seeting enabled: " + e + "   ******\n\n\n");
+		repaint();
+	}
 
 	@Override
 	protected void paintComponent(Graphics g) {
@@ -80,17 +89,26 @@ public class Slider extends JComponent implements MouseListener,
 				(int) (h * 0.9), w / 15, h / 15);
 
 		// Slider circle.
-		g2.setColor(Color.BLUE);
+		if (_enabled) {
+			g2.setColor(Color.BLUE);
+		} else {
+			g2.setColor(Color.DARK_GRAY);
+		}
 		g2.fillOval(w / 12, (int) (slidery
 				+ allowedPositions.get(currentPosition) * sliderh - h / 6),
 				h / 3, h / 3);
-		g2.setColor(Color.BLACK);
+		if (_selected) {
+			g2.setColor(Color.WHITE);
+		} else {
+			g2.setColor(Color.BLACK);
+		}
 		g2.setStroke(new BasicStroke(h / 50));
 		g2.drawOval(w / 12, (int) (slidery
 				+ allowedPositions.get(currentPosition) * sliderh - h / 6),
 				h / 3, h / 3);
 
 		// Slider tick marks
+		g2.setColor(Color.BLACK);
 		g2.setStroke(new BasicStroke(3));
 		for (double i = _min; i <= _max; i += _step) {
 			int y = (int) (slidery + sliderh - sliderh
@@ -114,8 +132,20 @@ public class Slider extends JComponent implements MouseListener,
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		setPosition(e.getY());
-		repaint();
+		if (_enabled) {
+			setPosition(e.getY());
+			_selected = true;
+			repaint();
+		}
+	}
+
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		if (_enabled) {
+			_selected = false;
+			repaint();
+		}
 	}
 
 	public void increase() {
@@ -157,14 +187,12 @@ public class Slider extends JComponent implements MouseListener,
 	}
 
 	@Override
-	public void mouseReleased(MouseEvent e) {
-	}
-
-	@Override
 	public void mouseDragged(MouseEvent arg0) {
 		// TODO Auto-generated method stub
-		setPosition(arg0.getY());
-		repaint();
+		if (_enabled) {
+			setPosition(arg0.getY());
+			repaint();
+		}
 	}
 
 	@Override

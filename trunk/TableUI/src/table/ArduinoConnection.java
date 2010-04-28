@@ -15,11 +15,11 @@ import java.io.IOException;
  * @author Jay Roltgen
  * 
  */
-public abstract class ArduinoConnection implements Runnable {
+public abstract class ArduinoConnection {
 
 	protected enum MessageType {
-		CONNECT, GET_PRESSURE, GET_VIBRATION, KEEP_ALIVE, SET_PRESSURE, 
-		SET_VIBRATION, START, STOP
+		CONNECT, GET_PRESSURE, KEEP_ALIVE, SET_PRESSURE, 
+		SET_VIBRATION, SET_SPEED, START, STOP
 	}
 
 	protected enum Response {
@@ -28,6 +28,19 @@ public abstract class ArduinoConnection implements Runnable {
 
 	protected DataInputStream _in;
 	protected DataOutputStream _out;
+
+	private static ArduinoConnection _instance = null;
+	
+	protected ArduinoConnection() {
+		connect();
+	}
+
+	public static ArduinoConnection getInstance() {
+		if (_instance == null) {
+			_instance = new ArduinoConnectionCSharpPipeImpl();
+		}
+		return _instance;
+	}
 	
 
 	/**
@@ -47,11 +60,13 @@ public abstract class ArduinoConnection implements Runnable {
 	 * @return The indicated pressure.
 	 */
 	public int getIndicatedPressure() {
+		System.out.println("Getting indicated pressure.");
 		synchronized (this) {
 			try {
 				_out.write(MessageType.GET_PRESSURE.ordinal());
+				_out.write(0);
 				int pressure = (_in.read() & 0xFF);
-				return pressure * 100 / 255;
+				return pressure;
 			} catch (IOException e) {
 				e.printStackTrace();
 				return -1;
@@ -69,9 +84,10 @@ public abstract class ArduinoConnection implements Runnable {
 	 * @return true on success, false on error.
 	 */
 	public boolean setPressure(int pounds) {
+		System.out.println("Setting pressure: " + pounds);
 		synchronized (this) {
 			try {
-				_out.write(MessageType.SET_VIBRATION.ordinal());
+				_out.write(MessageType.SET_PRESSURE.ordinal());
 				_out.write(pounds);
 				return handleAck();
 			} catch (IOException e) {
@@ -91,10 +107,25 @@ public abstract class ArduinoConnection implements Runnable {
 	 * @return true on success, false on error.
 	 */
 	public boolean setVibration(int percentage) {
+		System.out.println("Setting vibration: " + percentage);
 		synchronized (this) {
 			try {
 				_out.write(MessageType.SET_VIBRATION.ordinal());
-				_out.write((percentage * 255 / 100) & 0xFF);
+				_out.write(percentage);
+				return handleAck();
+			} catch (IOException e) {
+				e.printStackTrace();
+				return false;
+			}
+		}
+	}
+	
+	public boolean setSpeed(int percentage) {
+		System.out.println("Setting speed: " + percentage);
+		synchronized (this) {
+			try {
+				_out.write(MessageType.SET_SPEED.ordinal());
+				_out.write(percentage);
 				return handleAck();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -109,9 +140,11 @@ public abstract class ArduinoConnection implements Runnable {
 	 * @return true on success, false on error.
 	 */
 	public boolean start() {
+		System.out.println("Starting...");
 		synchronized (this) {
 			try {
 				_out.write(MessageType.START.ordinal());
+				_out.write(0);
 				return handleAck();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -126,9 +159,11 @@ public abstract class ArduinoConnection implements Runnable {
 	 * @return true on success, false on error.
 	 */
 	public boolean stop() {
+		System.out.println("Stopping.");
 		synchronized (this) {
 			try {
 				_out.write(MessageType.STOP.ordinal());
+				_out.write(0);
 				return handleAck();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -136,22 +171,6 @@ public abstract class ArduinoConnection implements Runnable {
 			}
 		}
 	}
-
-	/**
-	 * Runs this thread which keeps the arduino connection alive - if this
-	 * message is not sent often, the arduino will die.
-	 */
-	@Override
-	public void run() {
-		while (true) {
-			keepAlive();
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-	};
 	
 	/**
 	 * Handles an acknowledgement from the arduino - returns false if a false
@@ -162,9 +181,9 @@ public abstract class ArduinoConnection implements Runnable {
 	 *             on exception
 	 */
 	protected boolean handleAck() throws IOException {
-		System.out.println("Reading....");
+		//System.out.println("Handling ack.");
 		int response = _in.read();
-		System.out.println("Got response: " + response);
+		//System.out.println("Got response: " + response);
 		if (response == Response.SUCCESS.ordinal()) {
 			return true;
 		} else {
@@ -182,10 +201,12 @@ public abstract class ArduinoConnection implements Runnable {
 	 * 
 	 * @return
 	 */
-	protected boolean keepAlive() {
+	public boolean keepAlive() {
+		System.out.println("Stayin' alive:");
 		synchronized (this) {
 			try {
 				_out.write(MessageType.KEEP_ALIVE.ordinal());
+				_out.write(0);
 				return handleAck();
 			} catch (IOException e) {
 				e.printStackTrace();
