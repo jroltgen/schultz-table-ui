@@ -34,14 +34,14 @@ public class TableSlider extends JComponent implements KeyListener,
 	private TextField textField;
 	private TableSliderListener _listener;
 
-	public TableSlider(String units, int min, int max, int step, TableSliderListener t) {
+	public TableSlider(String units, int min, int max, int step, double defaultPos, TableSliderListener t) {
 		_units = units;
 		_max = max;
 		_min = min;
 
-		slider = new Slider(max, min, step, this);
-		downButton = new Button(this);
-		upButton = new Button(this);
+		slider = new Slider(max, min, step, defaultPos, this);
+		downButton = new Button(this, new Color(53, 152, 225), "DN");
+		upButton = new Button(this, new Color(53, 152, 225), "UP");
 		_listener = t;
 		
 		textField = new TextField();
@@ -50,7 +50,7 @@ public class TableSlider extends JComponent implements KeyListener,
 		add(upButton);
 		add(slider);
 		add(textField);
-		sliderUpdated(1);
+		sliderUpdated((max - defaultPos) / (max - min));
 	}
 
 	@Override
@@ -70,11 +70,11 @@ public class TableSlider extends JComponent implements KeyListener,
 	@Override
 	public void setSize(int w, int h) {
 		super.setSize(w, h);
-		downButton.setLocation(w / 20, (int) (h * 0.9));
-		upButton.setLocation((int) (w * 10.5 / 20), (int) (h * 0.9));
+		upButton.setLocation(w / 20, (int) (h * 0.87));
+		downButton.setLocation((int) (w * 10.5 / 20), (int) (h * 0.87));
 
-		downButton.setSize((int) (w * 8.5 / 20), h / 12);
-		upButton.setSize((int) (w * 8.5 / 20), h / 12);
+		downButton.setSize((int) (w * 8.5 / 20), (int)(h * 0.125));
+		upButton.setSize((int) (w * 8.5 / 20), (int)(h * 0.125));
 
 		slider.setLocation(w / 20, (int) (h * 0.15));
 		slider.setSize((int) (w * 0.9), (int) (h * 0.73));
@@ -86,7 +86,6 @@ public class TableSlider extends JComponent implements KeyListener,
 	@Override
 	public void sliderUpdated(double newValue) {
 		double value = (_min + (1 - newValue) * (_max - _min));
-		
 		textField.setText("" + Math.round(value));
 		repaint();
 		_listener.tableSliderUpdated(value, this);
@@ -123,6 +122,11 @@ public class TableSlider extends JComponent implements KeyListener,
 			slider.increase();
 		}
 
+	}
+
+	public void requestUpdate() {
+		// TODO Auto-generated method stub
+		slider.requestUpdate();
 	}
 
 }

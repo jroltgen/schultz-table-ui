@@ -2,6 +2,8 @@ package table.ui.widgets;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -35,17 +37,16 @@ public class Slider extends JComponent implements MouseListener,
 	private boolean _selected;
 	private boolean _enabled = true;
 
-	public Slider(double max, double min, double step, SliderListener l) {
+	public Slider(double max, double min, double step, double defaultPos, SliderListener l) {
 		_listeners = new Vector<SliderListener>();
 		_listeners.add(l);
 
 		allowedPositions = new Vector<Double>();
-		System.out.println("Cons");
+		
 		for (double i = min; i <= max + 0.01; i += step) {
-			System.out.println("Adding position: " + i);
 			allowedPositions.add((i - min) / max);
 		}
-		currentPosition = allowedPositions.size() - 1;
+		currentPosition = (int)(allowedPositions.size() - 1 - (defaultPos - min) / step);
 		addMouseListener(this);
 		addMouseMotionListener(this);
 
@@ -67,7 +68,7 @@ public class Slider extends JComponent implements MouseListener,
 	
 	public void setComponentEnabled(boolean e) {
 		_enabled = e;
-		System.out.println("\n\n\n*********Seeting enabled: " + e + "   ******\n\n\n");
+		//System.out.println("\n\n\n*********Seeting enabled: " + e + "   ******\n\n\n");
 		repaint();
 	}
 
@@ -79,43 +80,59 @@ public class Slider extends JComponent implements MouseListener,
 				RenderingHints.VALUE_ANTIALIAS_ON);
 		//g2.setColor(Color.BLUE);
 		//g2.fillRect(0, 0, getWidth(), getHeight());
-		g2.setColor(Color.DARK_GRAY);
 
 		int w = getWidth();
 		int h = getHeight();
-
-		// Slider rect.
-		g2.fillRoundRect(w / 12 + h / 6 - w / 30, (int) (h * 0.05), w / 15,
-				(int) (h * 0.9), w / 15, h / 15);
-
-		// Slider circle.
-		if (_enabled) {
-			g2.setColor(Color.BLUE);
-		} else {
-			g2.setColor(Color.DARK_GRAY);
-		}
-		g2.fillOval(w / 12, (int) (slidery
-				+ allowedPositions.get(currentPosition) * sliderh - h / 6),
-				h / 3, h / 3);
-		if (_selected) {
-			g2.setColor(Color.WHITE);
-		} else {
-			g2.setColor(Color.BLACK);
-		}
-		g2.setStroke(new BasicStroke(h / 50));
-		g2.drawOval(w / 12, (int) (slidery
-				+ allowedPositions.get(currentPosition) * sliderh - h / 6),
-				h / 3, h / 3);
-
+		
 		// Slider tick marks
-		g2.setColor(Color.BLACK);
+		g2.setColor(Color.DARK_GRAY);
 		g2.setStroke(new BasicStroke(3));
 		for (double i = _min; i <= _max; i += _step) {
 			int y = (int) (slidery + sliderh - sliderh
 					* ((i - _min) / (_max - _min)));
 			//System.out.println("Slider mark: " + y);
-			g2.drawLine(w / 12 + h / 3 + w / 12, y, (w * 11 / 12), y);
+			//g2.drawLine(w / 12 + h / 3 + w / 12, y, (w * 11 / 12), y);
+			//g2.drawLine(w/12 + h /6 - w/12, y, w/12 + h/6 + w/12, y);
 		}
+
+		// Slider rect.
+		g2.setColor(Color.DARK_GRAY);
+		g2.fillRoundRect(w / 12 + h / 6 - w / 30, (int) (h * 0.05), w / 15,
+				(int) (h * 0.9), w / 15, h / 15);
+		
+		// Slider min and max
+		g2.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 18));
+		g2.drawString("" + (int)_min, getWidth() * 2 / 3, getHeight() - 15);
+		g2.drawString("" + (int)_max, getWidth() * 2 / 3, 30);
+
+		// Slider circle.
+		Color c = new Color(53, 152, 225);
+		float hsbValues[] = Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), null);
+		Color lightColor = new Color(Color.HSBtoRGB(hsbValues[0], hsbValues[1], hsbValues[2] - .2f));
+		Color darkColor = new Color(Color.HSBtoRGB(hsbValues[0], hsbValues[1], hsbValues[2] - .5f));
+		
+		if (_enabled) {
+			GradientPaint fill = new GradientPaint(0, 0, lightColor, getWidth(), getHeight(), darkColor, false);
+			g2.setPaint(fill);
+		} else {
+			GradientPaint fill = new GradientPaint(0, 0, Color.GRAY, getWidth(), getHeight(), Color.DARK_GRAY, false);
+			g2.setPaint(fill);
+		}
+		
+		g2.fillOval(w / 12 + h / 12, (int) (slidery
+				+ allowedPositions.get(currentPosition) * sliderh - h / 12),
+				h / 6, h / 6);
+		if (_selected) {
+			g2.setColor(Color.WHITE);
+		} else {
+			g2.setColor(Color.BLACK);
+		}
+		g2.setStroke(new BasicStroke(h / 80));
+		g2.drawOval(w / 12 + h / 12, (int) (slidery
+				+ allowedPositions.get(currentPosition) * sliderh - h / 12),
+				h / 6, h / 6);
+
+		
 	}
 
 	@Override
@@ -148,7 +165,7 @@ public class Slider extends JComponent implements MouseListener,
 		}
 	}
 
-	public void increase() {
+	public void decrease() {
 		if (currentPosition < allowedPositions.size() - 1)
 			currentPosition++;
 		sliderUpdated();
@@ -162,7 +179,7 @@ public class Slider extends JComponent implements MouseListener,
 		}
 	}
 
-	public void decrease() {
+	public void increase() {
 		if (currentPosition > 0)
 			currentPosition--;
 		sliderUpdated();
@@ -197,5 +214,9 @@ public class Slider extends JComponent implements MouseListener,
 
 	@Override
 	public void mouseMoved(MouseEvent arg0) {
+	}
+
+	public void requestUpdate() {
+		sliderUpdated();
 	}
 }

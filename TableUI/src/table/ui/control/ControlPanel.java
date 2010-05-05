@@ -14,6 +14,7 @@ import table.ui.TableUI;
 import table.ui.widgetlisteners.ButtonListener;
 import table.ui.widgets.Button;
 import table.ui.widgets.TextField;
+import table.ui.widgets.TimeDisplay;
 
 public class ControlPanel extends JComponent implements ButtonListener, Runnable {
 
@@ -22,12 +23,14 @@ public class ControlPanel extends JComponent implements ButtonListener, Runnable
 	 */
 	private static final long serialVersionUID = -443837526010491012L;
 
-	private Button startButton;
-	private Button stopButton;
+	private Button startStopButton;
+	//private Button stopButton;
 	private Button resetButton;
+	
+	private TimeDisplay timeDisplay;
 
-	private TextField timeRemainingField;
-	private TextField timeElapsedField;
+	//private TextField timeRemainingField;
+	//private TextField timeElapsedField;
 	
 	private int secondsRemaining;
 	
@@ -41,33 +44,41 @@ public class ControlPanel extends JComponent implements ButtonListener, Runnable
 		
 		_tableUI = ui;
 		
-		startButton = new Button(this, Color.GREEN, "RUN");
-		stopButton = new Button(this, Color.RED, "STOP");
-		resetButton = new Button(this, Color.DARK_GRAY, "RESET");
-		timeRemainingField = new TextField(18);
-		timeElapsedField = new TextField(18);
+		startStopButton = new Button(this, Color.GREEN, "RUN");
+		//startButton = new Button(this, Color.GREEN, "RUN");
+		//stopButton = new Button(this, Color.RED, "STOP");
+		resetButton = new Button(this, Color.YELLOW, "RESET");
+		//timeRemainingField = new TextField(18);
+		//timeElapsedField = new TextField(18);
+		
+		timeDisplay = new TimeDisplay();
 
-		timeRemainingField.setText("15:00");
-		timeElapsedField.setText("00:00");
+		//timeRemainingField.setText("15:00");
+		//timeElapsedField.setText("00:00");
 
-		startButton.setSize(100, 70);
-		stopButton.setSize(100, 70);
+		startStopButton.setSize(100, 70);
+		//stopButton.setSize(100, 70);
 		resetButton.setSize(100, 70);
-		timeRemainingField.setSize(80, 30);
-		timeElapsedField.setSize(80, 30);
+		timeDisplay.setSize(300, 70);
+		//timeRemainingField.setSize(80, 30);
+		//timeElapsedField.setSize(80, 30);
 
-		stopButton.setLocation(375, 5);
-		startButton.setLocation(490, 5);
-		resetButton.setLocation(50, 5);
+		//stopButton.setLocation(375, 5);
+		startStopButton.setLocation(510, 5);
+		resetButton.setLocation(30, 5);
+		timeDisplay.setLocation(170, 5);
+		
+		startStopButton.setComponentEnabled(true);
 
-		timeRemainingField.setLocation(280, 5);
-		timeElapsedField.setLocation(280, 45);
+		//timeRemainingField.setLocation(280, 5);
+		//timeElapsedField.setLocation(280, 45);
 
-		add(stopButton);
+		add(startStopButton);
 		add(resetButton);
-		add(startButton);
-		add(timeRemainingField);
-		add(timeElapsedField);
+		add(timeDisplay);
+		//add(startButton);
+		//add(timeRemainingField);
+		//add(timeElapsedField);
 	}
 
 	@Override
@@ -77,9 +88,10 @@ public class ControlPanel extends JComponent implements ButtonListener, Runnable
 				RenderingHints.VALUE_ANTIALIAS_ON);
 
 		g2.setColor(Color.GRAY);
-		g2.fillRect(0, 0, getWidth(), getHeight());
+		//g2.fillRect(0, 0, getWidth(), getHeight());
 
 		// Draw stop lights
+		/*
 		if (_running) {
 			g2.setColor(Color.GREEN);
 		} else {
@@ -101,18 +113,18 @@ public class ControlPanel extends JComponent implements ButtonListener, Runnable
 		g2.drawOval(15, getHeight() - 35, 20, 20);
 		g2.drawOval(getWidth() - 35, 15, 20, 20);
 		g2.drawOval(getWidth() - 35, getHeight() - 35, 20, 20);
-		
+		*/
 		// Draw texts
-		g2.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 16));
+		g2.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 18));
 		g2.drawString("Remaining:", 180, 20 + 6);
 		g2.drawString("Elapsed:", 200, 60 + 6);
 	}
 
 	@Override
 	public void buttonPressed(Button src) {
-		if (src == startButton && _running == false) {
+		if (src == startStopButton && _running == false) {
 			start();
-		} else if (src == stopButton && _running == true) {
+		} else if (src == startStopButton && _running == true) {
 			stop();
 		} else if (src == resetButton) {
 			reset();
@@ -122,6 +134,11 @@ public class ControlPanel extends JComponent implements ButtonListener, Runnable
 	private void stop() {
 		_running = false;
 		_tableUI.setRunningSliderEnabled(true);
+		resetButton.setComponentEnabled(true);
+		startStopButton.setColor(Color.GREEN);
+		startStopButton.setText("RUN");
+		//startButton.setComponentEnabled(true);
+		//stopButton.setComponentEnabled(false);
 		ArduinoConnection.getInstance().stop();
 		repaint();
 	}
@@ -129,6 +146,12 @@ public class ControlPanel extends JComponent implements ButtonListener, Runnable
 	private void start() {
 		_running = true;
 		_tableUI.setRunningSliderEnabled(false);
+		resetButton.setComponentEnabled(false);
+		
+		startStopButton.setColor(Color.RED);
+		startStopButton.setText("STOP");
+		//stopButton.setComponentEnabled(true);
+		//startButton.setComponentEnabled(false);
 		ArduinoConnection.getInstance().start();
 		repaint();
 	}
@@ -173,7 +196,8 @@ public class ControlPanel extends JComponent implements ButtonListener, Runnable
 	
 
 	private void updateTime() {
-		int mRemaining = secondsRemaining / 60;
+		timeDisplay.setCurrentSeconds(_targetRunTimeSeconds - secondsRemaining);
+		/*int mRemaining = secondsRemaining / 60;
 		int sRemaining = secondsRemaining % 60;
 		
 		String s = "";
@@ -185,7 +209,7 @@ public class ControlPanel extends JComponent implements ButtonListener, Runnable
 			s += "0";
 		}
 		s += sRemaining;
-		timeRemainingField.setText(s);
+		//timeRemainingField.setText(s);
 		
 		int secondsElapsed = _targetRunTimeSeconds - secondsRemaining;
 		int mElapsed = secondsElapsed / 60;
@@ -199,8 +223,8 @@ public class ControlPanel extends JComponent implements ButtonListener, Runnable
 			s += "0";
 		}
 		s += sElapsed;
-		timeElapsedField.setText(s);
-		
+		//timeElapsedField.setText(s);
+		*/
 		
 	}
 
@@ -212,6 +236,7 @@ public class ControlPanel extends JComponent implements ButtonListener, Runnable
 	public void setTargetTime(int tseconds) {
 		_targetRunTimeSeconds = tseconds;
 		secondsRemaining = _targetRunTimeSeconds;
+		timeDisplay.setTotalSeconds(tseconds);
 		updateTime();
 	}
 	

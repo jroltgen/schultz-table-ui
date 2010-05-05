@@ -17,6 +17,7 @@ public class TableUI implements TableSliderListener {
 	private TableSlider vibration;
 	private TableSlider speed;
 	private ControlPanel controlPanel;
+	private NamePanel namePanel;
 
 	/**
 	 * For testing
@@ -39,25 +40,30 @@ public class TableUI implements TableSliderListener {
 		myPanel.setSize(640, 480);
 		myPanel.setLayout(null);
 		myPanel.setBackground(Color.GRAY);
+		
+		namePanel = new NamePanel();
+		namePanel.setLocation(0, 0);
+		namePanel.setSize(640, 45);
+		myPanel.add(namePanel);
 
-		runTime = new TableSlider("mins", 0, 30, 5, this);
+		runTime = new TableSlider("mins", 0, 30, 5, 5, this);
 		runTime.setLocation(0, 30);
-		runTime.setSize(160, 350);
+		runTime.setSize(160, 360);
 		myPanel.add(runTime);
 
-		pressure = new TableSlider("lbs", 0, 50, 5, this);
+		pressure = new TableSlider("lbs", 0, 50, 5, 15, this);
 		pressure.setLocation(160, 30);
-		pressure.setSize(160, 350);
+		pressure.setSize(160, 360);
 		myPanel.add(pressure);
 
-		vibration = new TableSlider("% vib", 0, 100, 10, this);
+		vibration = new TableSlider("% vib", 0, 100, 10, 0, this);
 		vibration.setLocation(320, 30);
-		vibration.setSize(160, 350);
+		vibration.setSize(160, 360);
 		myPanel.add(vibration);
 		
-		speed = new TableSlider("speed", 0, 7, 1, this);
+		speed = new TableSlider("speed", 0, 7, 1, 4, this);
 		speed.setLocation(480, 30);
-		speed.setSize(160, 350);
+		speed.setSize(160, 360);
 		myPanel.add(speed);
 		
 		controlPanel = new ControlPanel(this);
@@ -73,6 +79,9 @@ public class TableUI implements TableSliderListener {
 		
 		Thread t = new Thread(controlPanel);
 		t.start();
+		
+		// TODO this is rather hacky, updates the control panel.
+		runTime.requestUpdate();
 	}
 
 	@Override
@@ -89,7 +98,7 @@ public class TableUI implements TableSliderListener {
 	}
 
 	public void setRunningSliderEnabled(boolean e) {
-		System.out.println("Setting enbled...\n");
+		//System.out.println("Setting enbled...\n");
 		runTime.setComponentEnabled(e);
 	}
 }
