@@ -70,14 +70,16 @@ public class TableSlider extends JComponent implements KeyListener,
 	@Override
 	public void setSize(int w, int h) {
 		super.setSize(w, h);
-		upButton.setLocation(w / 20, (int) (h * 0.87));
-		downButton.setLocation((int) (w * 10.5 / 20), (int) (h * 0.87));
-
+		//upButton.setLocation(w / 20, (int) (h * 0.87));
+		//downButton.setLocation((int) (w * 10.5 / 20), (int) (h * 0.87));
+		upButton.setLocation(w/8, (int)(h * 0.18));
+		downButton.setLocation(w/8, (int)(h * 0.85));
+		
 		downButton.setSize((int) (w * 8.5 / 20), (int)(h * 0.125));
 		upButton.setSize((int) (w * 8.5 / 20), (int)(h * 0.125));
 
-		slider.setLocation(w / 20, (int) (h * 0.15));
-		slider.setSize((int) (w * 0.9), (int) (h * 0.73));
+		slider.setLocation(w / 20, (int) (h * 0.3));
+		slider.setSize((int) (w * 0.9), (int) (h * 0.55));
 		
 		textField.setLocation(w / 20, h / 20);
 		textField.setSize((int)(w * 0.5), (int)(h * 0.1));
