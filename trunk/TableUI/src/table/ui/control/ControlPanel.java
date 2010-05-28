@@ -164,7 +164,7 @@ public class ControlPanel extends JComponent implements ButtonListener, Runnable
 	
 	public void run() {
 		final int timerUpdateRate = 1000;
-		final int watchDogUpdateRate = 250;
+		final int watchDogUpdateRate = 500;
 	
 		long lastTimerUpdate = System.currentTimeMillis() - 1000;
 		long lastWatchDogUpdate = System.currentTimeMillis() - 1000;
@@ -230,7 +230,7 @@ public class ControlPanel extends JComponent implements ButtonListener, Runnable
 
 	private void petTheWatchdog() {
 		// TODO Auto-generated method stub
-		//ArduinoConnection.getInstance().keepAlive();
+		ArduinoConnection.getInstance().keepAlive();
 	}
 	
 	public void setTargetTime(int tseconds) {

@@ -3,6 +3,7 @@ package table.ui.widgets;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 
@@ -55,20 +56,26 @@ public class TimeDisplay extends JComponent {
 				(int) (getWidth() * 0.8 + size), (int) (getHeight() * 0.2), 10, 10);
 		
 		// Draw oval
-		int sliderCenterX = (int)((0.1 + (currentSeconds / (float)totalSeconds) * 0.8) * getWidth());
-		int sliderCenterY = (int)(getHeight() * 0.6);
+		int scX;
+		if (totalSeconds == 0) {
+			scX = (int)(0.1 * getWidth());
+		} else {
+			scX = (int)((0.1 + (currentSeconds / (float)totalSeconds) * 0.8) * getWidth());
+		}
+		int scY = (int)(getHeight() * 0.6);
 		
 		
-		g2.setColor(_darkColor);
-		g2.fillOval(sliderCenterX - size/2, sliderCenterY - size/2, size, size);
+		GradientPaint fill = new GradientPaint(scX - size/2, scY - size/2, _lightColor, scX + size/4, scY + size/4, _darkColor, false);
+		g2.setPaint(fill);
+		g2.fillOval(scX - size/2, scY - size/2, size, size);
 		
 		g2.setStroke(new BasicStroke(2));
 		g2.setColor(Color.BLACK);
-		g2.drawOval(sliderCenterX - size/2, sliderCenterY - size/2, size, size);
+		g2.drawOval(scX - size/2, scY - size/2, size, size);
 		
 		// Draw time
 		g2.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 16));
-		g2.drawString(getTimeString(currentSeconds), sliderCenterX - 20, (int)(getHeight() * 0.35));
+		g2.drawString(getTimeString(currentSeconds), scX - 20, (int)(getHeight() * 0.35));
 
 	}
 	

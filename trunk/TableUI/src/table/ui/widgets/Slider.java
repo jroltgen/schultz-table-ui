@@ -62,8 +62,8 @@ public class Slider extends JComponent implements MouseListener,
 	@Override
 	public void setSize(int w, int h) {
 		super.setSize(w, h);
-		slidery = (int) (h * 0.05 + h / 6);
-		sliderh = (int) (h * 0.9 - h / 3);
+		slidery = (int) (h * 0.05 + h / 12);
+		sliderh = (int) (h * 0.9 - h / 6);
 	}
 	
 	public void setComponentEnabled(boolean e) {
@@ -109,28 +109,28 @@ public class Slider extends JComponent implements MouseListener,
 		Color c = new Color(53, 152, 225);
 		float hsbValues[] = Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), null);
 		Color lightColor = new Color(Color.HSBtoRGB(hsbValues[0], hsbValues[1], hsbValues[2] - .2f));
-		Color darkColor = new Color(Color.HSBtoRGB(hsbValues[0], hsbValues[1], hsbValues[2] - .5f));
+		Color darkColor = new Color(Color.HSBtoRGB(hsbValues[0], hsbValues[1], hsbValues[2] - .8f));
+		
+		int sx = w / 12 + h / 12;
+		int sy = (int) (slidery + allowedPositions.get(currentPosition) * sliderh - h / 12);
+		
 		
 		if (_enabled) {
-			GradientPaint fill = new GradientPaint(0, 0, lightColor, getWidth(), getHeight(), darkColor, false);
+			GradientPaint fill = new GradientPaint(sx, sy, lightColor, sx + h/6, sy + h/6, darkColor, false);
 			g2.setPaint(fill);
 		} else {
-			GradientPaint fill = new GradientPaint(0, 0, Color.GRAY, getWidth(), getHeight(), Color.DARK_GRAY, false);
+			GradientPaint fill = new GradientPaint(sx, sy, Color.GRAY, sx + h/6, sy + h/6, Color.DARK_GRAY, false);
 			g2.setPaint(fill);
 		}
 		
-		g2.fillOval(w / 12 + h / 12, (int) (slidery
-				+ allowedPositions.get(currentPosition) * sliderh - h / 12),
-				h / 6, h / 6);
-		if (_selected) {
-			g2.setColor(Color.WHITE);
-		} else {
+		g2.fillOval(sx, sy, h / 6, h / 6);
+		//if (_selected) {
+		//	g2.setColor(Color.WHITE);
+		//} else {
 			g2.setColor(Color.BLACK);
-		}
+		//}
 		g2.setStroke(new BasicStroke(h / 80));
-		g2.drawOval(w / 12 + h / 12, (int) (slidery
-				+ allowedPositions.get(currentPosition) * sliderh - h / 12),
-				h / 6, h / 6);
+		g2.drawOval(sx, sy, h / 6, h / 6);
 
 		
 	}

@@ -202,7 +202,7 @@ public abstract class ArduinoConnection {
 	 * @return
 	 */
 	public boolean keepAlive() {
-		System.out.println("Stayin' alive:");
+		//System.out.println("Stayin' alive:");
 		synchronized (this) {
 			try {
 				_out.write(MessageType.KEEP_ALIVE.ordinal());
